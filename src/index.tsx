@@ -12,6 +12,7 @@ export const CaptionsRenderrer = ({
   srv3,
   currentTime,
 }: CaptionsRenderrerProps) => {
+  const refSelf = React.useRef<HTMLDivElement>(null);
   const [
     parsedCaptions,
     setParsedCaptions,
@@ -28,65 +29,134 @@ export const CaptionsRenderrer = ({
     setActiveEvents(active);
   }, [currentTime]);
 
+  const videoHeight = refSelf.current?.getBoundingClientRect().height || 0;
+
   return (
     <div
+      ref={refSelf}
       style={{
         width: '100%',
         height: '100%',
-        color: '#fff',
+        overflow: 'hidden',
         position: 'relative',
       }}
     >
-      {activeEvents.map((event) => {
-        if (!parsedCaptions) return;
-        const windowStyle: React.CSSProperties = {
+      <div
+        style={{
           position: 'absolute',
-        };
-        const wPos = parsedCaptions.windowPositions[event.windowPositionId];
-        // const wStyle = parsedCaptions.windowStyles[event.windowStyleId]
+          left: '2%',
+          right: '2%',
+          top: '2%',
+          bottom: '2%',
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+          }}
+        >
+          {activeEvents.map((event) => {
+            if (!parsedCaptions) return;
+            const windowStyle: React.CSSProperties = {
+              position: 'absolute',
+            };
+            const wPos = parsedCaptions.windowPositions[event.windowPositionId];
+            const wStyle = parsedCaptions.windowStyles[event.windowStyleId];
 
-        // Alignment
-        windowStyle.left = wPos.alignHorizontal + '%';
-        windowStyle.top = wPos.alignVertical + '%';
+            // Position and anchor point
+            let translateX = '0';
+            let translateY = '0';
+            if (['0', '1', '2'].includes(wPos.anchorPoint)) {
+              windowStyle.top = wPos.alignVertical + '%';
+            } else if (['3', '4', '5'].includes(wPos.anchorPoint)) {
+              translateY = '50%';
+              windowStyle.bottom = 100 - wPos.alignVertical + '%';
+            } else {
+              windowStyle.bottom = 100 - wPos.alignVertical + '%';
+            }
 
-        // Anchor point
-        let translateX = '0';
-        let translateY = '0';
-        if (['0', '1', '2'].includes(wPos.anchorPoint)) translateY = '0';
-        else if (['3', '4', '5'].includes(wPos.anchorPoint))
-          translateY = '-50%';
-        else translateY = '-100%';
-        if (['0', '3', '6'].includes(wPos.anchorPoint)) translateX = '0';
-        else if (['1', '4', '7'].includes(wPos.anchorPoint))
-          translateX = '-50%';
-        else translateX = '-100%';
-        windowStyle.transform = `translate(${translateX}, ${translateY})`;
+            if (['0', '3', '6'].includes(wPos.anchorPoint)) {
+              windowStyle.left = wPos.alignHorizontal + '%';
+            } else if (['1', '4', '7'].includes(wPos.anchorPoint)) {
+              translateX = '50%';
+              windowStyle.right = 100 - wPos.alignHorizontal + '%';
+            } else {
+              windowStyle.right = 100 - wPos.alignHorizontal + '%';
+            }
+            windowStyle.transform = `translate(${translateX}, ${translateY})`;
 
-        return (
-          <div
-            data-caption-window
-            style={windowStyle}
-            key={JSON.stringify(event)}
-          >
-            {event.segments.map((seg) => {
-              const segmentStyle: React.CSSProperties = {};
-              const pen = parsedCaptions.pens[seg.penId || 1];
-              if (pen.bold) segmentStyle.fontWeight = 'bold';
-              if (pen.italic) segmentStyle.fontStyle = 'italic';
-              if (pen.underline) segmentStyle.textDecoration = 'underline';
-              segmentStyle.fontFamily = fontMap[pen.fontStyle];
-              segmentStyle.fontSize = pen.fontSize / 100 + 'em';
-              segmentStyle.color = toRGBA(pen.fontColor, pen.fontOpacity);
-              segmentStyle.backgroundColor = toRGBA(
-                pen.backColor,
-                pen.backOpacity
-              );
+            windowStyle.textAlign = wStyle.justify || 'center';
+            windowStyle.background = toRGBA(
+              wStyle.windowFillColor,
+              wStyle.windowFillOpacity
+            );
 
-              return <span style={segmentStyle}>{seg.text}</span>;
-            })}
-          </div>
-        );
-      })}
+            return (
+              <div className='react-srv3-caption-window' style={windowStyle}>
+                {event.segments.map((seg) => {
+                  const segmentStyle: React.CSSProperties = {
+                    whiteSpace: 'pre',
+                    paddingLeft: '.25em',
+                    paddingRight: '.25em',
+                  };
+                  const pen = parsedCaptions.pens[seg.penId || 1];
+                  if (pen.bold) segmentStyle.fontWeight = 'bold';
+                  if (pen.italic) segmentStyle.fontStyle = 'italic';
+                  if (pen.underline) segmentStyle.textDecoration = 'underline';
+
+                  // Transform the font size
+                  // After some testing, I found this linear equation that
+                  // closely matches how YouTube scales captions.
+                  const pixelFontSize =
+                    0.04 * pen.fontSize + (1 / 30) * videoHeight;
+
+                  segmentStyle.fontSize = pixelFontSize + 'px';
+                  segmentStyle.fontFamily = fontMap[pen.fontStyle];
+                  segmentStyle.color = toRGBA(pen.fontColor, pen.fontOpacity);
+                  segmentStyle.backgroundColor = toRGBA(
+                    pen.backColor,
+                    pen.backOpacity
+                  );
+
+                  if (pen.edgeType === 1) {
+                    // drop shadow
+                    segmentStyle.textShadow = pen.edgeColor + ' 0 0 5px';
+                  } else if (pen.edgeType === 2) {
+                    // raised
+                    segmentStyle.textShadow = Array(5)
+                      .fill(pen.edgeColor + ' 0 0 1px')
+                      .join(', ');
+                  } else if (pen.edgeType === 3) {
+                    // uniform
+                    segmentStyle.textShadow = Array(5)
+                      .fill(pen.edgeColor + ' 0 0 1px')
+                      .join(', ');
+                  } else if (pen.edgeType === 4) {
+                    // not sure what this is but I found it in this video S8dmq5YIUoc
+                    segmentStyle.textShadow = [1.5, 2, 2.5]
+                      .map((px) => pen.edgeColor + ' 1px 1px ' + px + 'px')
+                      .join(', ');
+                  }
+
+                  if (seg.timeOffset + event.startTime > currentTime * 1000)
+                    segmentStyle.opacity = 0;
+
+                  return (
+                    <span
+                      className='react-srv3-caption-segment'
+                      style={segmentStyle}
+                    >
+                      {seg.text}
+                    </span>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };

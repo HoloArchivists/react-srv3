@@ -4,6 +4,7 @@ import {
   CaptionSegment,
   CaptionEvent,
 } from '../captions.interface';
+import he from 'he';
 
 /**
  * Referenced from
@@ -12,11 +13,14 @@ import {
 
 export const parseSrv3XML = (xmlString: string) => {
   console.log('Parsing XML');
+
   const xml = fxp.parse(xmlString, {
     attributeNamePrefix: '@_',
     ignoreAttributes: false,
     trimValues: false,
   });
+  if (!xml.timedtext) return null;
+
   const cc: ParsedCaptions = {
     pens: [],
     windowStyles: [],
@@ -30,56 +34,89 @@ export const parseSrv3XML = (xmlString: string) => {
   /**
    * Parse head
    */
-  if (!xml.timedtext || !xml.timedtext.head) return null;
-  for (const pen of xml.timedtext.head.pen) {
-    cc.pens[pen['@_id']] = {
-      bold: pen['@_b'] === '1',
-      italic: pen['@_i'] === '1',
-      underline: pen['@_u'] === '1',
-      fontStyle: Number(pen['@_fs'] || 0),
-      fontSize: Number(pen['@_sz'] || 100),
-      fontColor: pen['@_fc'] || '#ffffff',
-      backColor: pen['@_bc'] || '#000000',
-      edgeColor: pen['@_ec'] || '#000000',
-      fontOpacity: Number(pen['@_fo'] || 1),
-      backOpacity: Number(pen['@_bo'] || 0.75),
-      edgeType: Number(pen['@_et'] || 0),
-      offset: Number(pen['@_of'] || 0),
-      ruby: pen['@_rb'],
-      horizontalGuide: pen['@_hg'] === '1',
-      textEmphasis: pen['@_te'],
-    };
-  }
+  if (xml.timedtext.head) {
+    for (const pen of xml.timedtext.head.pen) {
+      cc.pens[pen['@_id']] = {
+        bold: pen['@_b'] === '1',
+        italic: pen['@_i'] === '1',
+        underline: pen['@_u'] === '1',
+        fontStyle: Number(pen['@_fs'] || 0),
+        fontSize: Number(pen['@_sz'] || 100),
+        fontColor: pen['@_fc'] || '#ffffff',
+        backColor: pen['@_bc'] || '#000000',
+        edgeColor: pen['@_ec'] || '#000000',
+        fontOpacity: Number(pen['@_fo'] || 255),
+        backOpacity: Number(pen['@_bo'] || 191),
+        edgeType: Number(pen['@_et'] || 0),
+        offset: Number(pen['@_of'] || 0),
+        ruby: pen['@_rb'],
+        horizontalGuide: pen['@_hg'] === '1',
+        textEmphasis: pen['@_te'],
+      };
+    }
 
-  for (const ws of xml.timedtext.head.ws) {
-    cc.windowStyles[ws['@_id']] = {
-      justify:
-        ws['@_ju'] === '0'
-          ? 'start'
-          : ws['@_ju'] === '1'
-          ? 'end'
-          : ws['@_ju'] === '2'
-          ? 'center'
-          : ws['@_ju'] === '3'
-          ? 'justify'
-          : 'center',
-      printDirection:
-        ws['@_pd'] === '0' ? 'ltr' : ws['@_pd'] === '1' ? 'rtl' : ws['@_pd'],
-      scrollDirection:
-        ws['@_sd'] === '0' ? 'ltr' : ws['@_sd'] === '1' ? 'rtl' : ws['@_sd'],
-      modeHint: ws['@_mh'] === '2' ? 'scroll' : 'default',
-      windowFillColor: ws['@_wfc'],
-      windowFillOpacity: Number(ws['@_wfo'] || 0),
-    };
-  }
+    for (const ws of xml.timedtext.head.ws) {
+      cc.windowStyles[ws['@_id']] = {
+        justify:
+          ws['@_ju'] === '0'
+            ? 'start'
+            : ws['@_ju'] === '1'
+            ? 'end'
+            : ws['@_ju'] === '2'
+            ? 'center'
+            : ws['@_ju'] === '3'
+            ? 'justify'
+            : 'center',
+        printDirection:
+          ws['@_pd'] === '0' ? 'ltr' : ws['@_pd'] === '1' ? 'rtl' : 'ltr',
+        scrollDirection:
+          ws['@_sd'] === '0' ? 'ltr' : ws['@_sd'] === '1' ? 'rtl' : 'ltr',
+        modeHint: ws['@_mh'] === '2' ? 'scroll' : 'default',
+        windowFillColor: ws['@_wfc'] || '#000000',
+        windowFillOpacity: Number(ws['@_wfo'] || 0),
+      };
+    }
 
-  for (const wp of xml.timedtext.head.wp) {
-    cc.windowPositions[wp['@_id']] = {
-      anchorPoint: wp['@_ap'] || '7',
-      columnCount: wp['@_cc'],
-      rowCount: wp['@_rc'],
-      alignHorizontal: Number(wp['@_ah'] || 50),
-      alignVertical: Number(wp['@_av'] || 100),
+    for (const wp of xml.timedtext.head.wp) {
+      cc.windowPositions[wp['@_id']] = {
+        anchorPoint: wp['@_ap'] || '7',
+        columnCount: wp['@_cc'],
+        rowCount: wp['@_rc'],
+        alignHorizontal: Number(wp['@_ah'] || 50),
+        alignVertical: Number(wp['@_av'] || 100),
+      };
+    }
+  } else {
+    // No head present, give default values
+    cc.pens[1] = {
+      bold: false,
+      italic: false,
+      underline: false,
+      fontStyle: 0,
+      fontSize: 100,
+      fontColor: '#ffffff',
+      backColor: '#000000',
+      edgeColor: '#000000',
+      fontOpacity: 255,
+      backOpacity: 191,
+      edgeType: 0,
+      offset: 0,
+      ruby: 0,
+      horizontalGuide: false,
+      textEmphasis: '',
+    };
+    cc.windowStyles[1] = {
+      justify: 'center',
+      printDirection: 'ltr',
+      scrollDirection: 'ltr',
+      windowFillColor: '#000000',
+      windowFillOpacity: 0,
+      modeHint: 'default',
+    };
+    cc.windowPositions[1] = {
+      anchorPoint: '7',
+      alignHorizontal: 50,
+      alignVertical: 100,
     };
   }
 
@@ -91,13 +128,15 @@ export const parseSrv3XML = (xmlString: string) => {
     let segments: CaptionSegment[] = [];
     if ('#text' in event)
       segments.push({
-        text: event['#text'] || '',
+        text: he.decode(event['#text'] || ''),
         penId: Number(event['@_p'] || 1),
+        timeOffset: 0,
       });
     else
       segments = event.s.map((s: any) => ({
-        text: s['#text'] || '',
+        text: he.decode(s['#text'] || ''),
         penId: Number(s['@_p'] || 1),
+        timeOffset: Number(s['@_t'] || 0),
       }));
 
     cc.events.push({
@@ -160,7 +199,7 @@ export const findActive = (captions: ParsedCaptions, timestampMs: number) => {
   // Look backwards for previously-active captions
   let i = idxLatest;
   while (
-    i > 0 &&
+    i >= 0 &&
     timestampMs - captions.events[i].startTime < captions.eventMeta.maxDuration
   ) {
     const event = captions.events[i];
@@ -172,12 +211,10 @@ export const findActive = (captions: ParsedCaptions, timestampMs: number) => {
     i--;
   }
 
-  return visibleEvents;
+  return visibleEvents.reverse();
 };
 
 export const toRGBA = (hex: string, opacity: number) => {
-  const opHex = Math.round(255 * opacity)
-    .toString(16)
-    .padStart(2, '0');
+  const opHex = opacity.toString(16).padStart(2, '0');
   return hex + opHex;
 };

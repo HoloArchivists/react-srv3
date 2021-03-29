@@ -19,14 +19,14 @@ export type Pen = {
   textEmphasis: string;
 };
 
-export type WindowStyle = Partial<{
+export type WindowStyle = {
   justify: 'start' | 'end' | 'center' | 'justify';
   printDirection: 'ltr' | 'rtl' | '2' | '3';
   scrollDirection: 'ltr' | 'rtl';
   modeHint: 'default' | 'scroll';
   windowFillColor: string;
   windowFillOpacity: number;
-}>;
+};
 
 export type WindowPosition = {
   anchorPoint: string;
@@ -38,7 +38,8 @@ export type WindowPosition = {
 
 export type CaptionSegment = {
   text: string;
-  penId?: number;
+  penId: number;
+  timeOffset: number;
 };
 
 export type CaptionEvent = {
