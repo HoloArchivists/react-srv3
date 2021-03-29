@@ -1,10 +1,18 @@
-import * as React from 'react'
-import styles from './styles.module.css'
+import * as React from 'react';
 
-interface Props {
-  text: string
+interface CaptionsRenderrerProps {
+  srv3: string;
+  currentTime: number;
 }
 
-export const ExampleComponent = ({ text }: Props) => {
-  return <div className={styles.test}>Example Component: {text}</div>
-}
+export const CaptionsRenderrer = ({
+  srv3,
+  currentTime,
+}: CaptionsRenderrerProps) => {
+  console.log(srv3);
+  return (
+    <div style={{ width: '100%', height: '100%', color: '#fff' }}>
+      {currentTime}
+    </div>
+  );
+};
