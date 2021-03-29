@@ -1,4 +1,4 @@
-export type Pen = Partial<{
+export type Pen = {
   bold: boolean;
   italic: boolean;
   underline: boolean;
@@ -17,7 +17,7 @@ export type Pen = Partial<{
   ruby: number;
   horizontalGuide: boolean;
   textEmphasis: string;
-}>;
+};
 
 export type WindowStyle = Partial<{
   justify: 'start' | 'end' | 'center' | 'justify';
@@ -28,30 +28,33 @@ export type WindowStyle = Partial<{
   windowFillOpacity: number;
 }>;
 
-export type WindowPosition = Partial<{
+export type WindowPosition = {
   anchorPoint: string;
-  columnCount: string;
-  rowCount: string;
-  alignHorizontal: string;
-  alignVertical: string;
-}>;
+  columnCount?: string;
+  rowCount?: string;
+  alignHorizontal: number;
+  alignVertical: number;
+};
 
-export type CaptionSegment = Partial<{
+export type CaptionSegment = {
   text: string;
-  penId: number;
-}>;
+  penId?: number;
+};
 
-export type CaptionEvent = Partial<{
+export type CaptionEvent = {
   startTime: number;
   duration: number;
   windowPositionId: number;
   windowStyleId: number;
   segments: CaptionSegment[];
-}>;
+};
 
 export type ParsedCaptions = {
   pens: Pen[];
   windowStyles: WindowStyle[];
   windowPositions: WindowPosition[];
   events: CaptionEvent[];
+  eventMeta: {
+    maxDuration: number;
+  };
 };

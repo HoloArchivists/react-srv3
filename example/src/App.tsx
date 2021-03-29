@@ -38,7 +38,10 @@ const App = () => {
           style={{
             width: 640,
             height: 360,
-            background: 'black',
+            backgroundImage: `url("https://i.ytimg.com/vi_webp/${videoId}/sddefault.webp")`,
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
           }}
         >
           <CaptionsRenderrer srv3={captionsText} currentTime={currentTime} />
