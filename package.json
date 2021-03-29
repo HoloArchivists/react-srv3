@@ -2,7 +2,7 @@
   "name": "react-srv3",
   "version": "1.0.0",
   "description": "React component to render YouTube SRV3 closed captions",
-  "author": "hizkifw",
+  "author": "Hizkia Felix Winata",
   "license": "MIT",
   "repository": "hizkifw/react-srv3",
   "main": "dist/index.js",
@@ -58,9 +58,7 @@
     "react-scripts": "^3.4.1",
     "typescript": "^3.7.5"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "dependencies": {
     "fast-xml-parser": "^3.19.0",
     "he": "^1.2.0"

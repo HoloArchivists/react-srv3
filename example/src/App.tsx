@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CaptionsRenderrer } from 'react-srv3';
+import { CaptionsRenderer } from 'react-srv3';
 import YoutubePlayer from './YoutubePlayer';
 
 const App = () => {
@@ -46,7 +46,7 @@ const App = () => {
             backgroundSize: 'cover',
           }}
         >
-          <CaptionsRenderrer srv3={captionsText} currentTime={currentTime} />
+          <CaptionsRenderer srv3={captionsText} currentTime={currentTime} />
         </div>
       </div>
     </div>

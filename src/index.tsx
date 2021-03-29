@@ -3,15 +3,15 @@ import { parseSrv3XML, findActive, toRGBA } from './util/srv3';
 import { ParsedCaptions, CaptionEvent } from './captions.interface';
 import { fontMap } from './constants';
 
-export type CaptionsRenderrerProps = {
+export type CaptionsRendererProps = {
   srv3: string;
   currentTime: number;
 };
 
-export const CaptionsRenderrer = ({
+export const CaptionsRenderer = ({
   srv3,
   currentTime,
-}: CaptionsRenderrerProps) => {
+}: CaptionsRendererProps) => {
   const refSelf = React.useRef<HTMLDivElement>(null);
   const [
     parsedCaptions,
