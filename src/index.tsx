@@ -95,12 +95,16 @@ export const CaptionsRenderer = ({
 
             return (
               <div className='react-srv3-caption-window' style={windowStyle}>
-                {event.segments.map((seg) => {
+                {event.segments.map((seg, idx) => {
                   const segmentStyle: React.CSSProperties = {
                     whiteSpace: 'pre',
-                    paddingLeft: '.25em',
-                    paddingRight: '.25em',
                   };
+
+                  // Padding
+                  if (idx === 0) segmentStyle.paddingLeft = '.25em';
+                  if (idx === event.segments.length - 1)
+                    segmentStyle.paddingRight = '.25em';
+
                   const pen = parsedCaptions.pens[seg.penId || 1];
                   if (pen.bold) segmentStyle.fontWeight = 'bold';
                   if (pen.italic) segmentStyle.fontStyle = 'italic';
