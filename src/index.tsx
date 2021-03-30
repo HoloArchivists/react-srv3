@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { parseSrv3XML, findActive, toRGBA } from './util/srv3';
+import {
+  parseSrv3XML,
+  findActive,
+  toRGBA,
+  defaultWindowPosition,
+  defaultWindowStyle,
+  defaultPen,
+} from './util/srv3';
 import { ParsedCaptions, CaptionEvent } from './captions.interface';
 import { fontMap } from './constants';
 
@@ -62,8 +69,12 @@ export const CaptionsRenderer = ({
             const windowStyle: React.CSSProperties = {
               position: 'absolute',
             };
-            const wPos = parsedCaptions.windowPositions[event.windowPositionId];
-            const wStyle = parsedCaptions.windowStyles[event.windowStyleId];
+            const wPos =
+              parsedCaptions.windowPositions[event.windowPositionId] ||
+              defaultWindowPosition;
+            const wStyle =
+              parsedCaptions.windowStyles[event.windowStyleId] ||
+              defaultWindowStyle;
 
             // Position and anchor point
             let translateX = '0';
@@ -105,7 +116,7 @@ export const CaptionsRenderer = ({
                   if (idx === event.segments.length - 1)
                     segmentStyle.paddingRight = '.25em';
 
-                  const pen = parsedCaptions.pens[seg.penId || 1];
+                  const pen = parsedCaptions.pens[seg.penId || 1] || defaultPen;
                   if (pen.bold) segmentStyle.fontWeight = 'bold';
                   if (pen.italic) segmentStyle.fontStyle = 'italic';
                   if (pen.underline) segmentStyle.textDecoration = 'underline';

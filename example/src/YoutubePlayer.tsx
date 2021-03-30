@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAnimationFrame } from './useAnimationFrame';
 
 export type YoutubePlayerProps = {
   videoId: string;
@@ -26,18 +27,13 @@ const YoutubePlayer = (props: YoutubePlayerProps) => {
     }
   }, []);
 
-  React.useEffect(() => {
-    const i = setInterval(sync, 100);
-    return () => clearInterval(i);
-  }, []);
-
-  const sync = () => {
+  useAnimationFrame(() => {
     try {
       const time = player.current.getCurrentTime();
       const state = player.current.getPlayerState();
       if (state === 1) onTimeChange(time);
     } catch (ex) {}
-  };
+  });
 
   const loadVideo = () => {
     player.current = new (window as any).YT.Player('youtube-player', {

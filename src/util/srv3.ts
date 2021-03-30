@@ -3,8 +3,44 @@ import {
   ParsedCaptions,
   CaptionSegment,
   CaptionEvent,
+  Pen,
+  WindowStyle,
+  WindowPosition,
 } from '../captions.interface';
 import he from 'he';
+
+export const defaultPen: Pen = {
+  bold: false,
+  italic: false,
+  underline: false,
+  fontStyle: 0,
+  fontSize: 100,
+  fontColor: '#ffffff',
+  backColor: '#000000',
+  edgeColor: '#000000',
+  fontOpacity: 255,
+  backOpacity: 191,
+  edgeType: 0,
+  offset: 0,
+  ruby: 0,
+  horizontalGuide: false,
+  textEmphasis: '',
+};
+
+export const defaultWindowStyle: WindowStyle = {
+  justify: 'center',
+  printDirection: 'ltr',
+  scrollDirection: 'ltr',
+  windowFillColor: '#000000',
+  windowFillOpacity: 0,
+  modeHint: 'default',
+};
+
+export const defaultWindowPosition: WindowPosition = {
+  anchorPoint: '7',
+  alignHorizontal: 50,
+  alignVertical: 100,
+};
 
 /**
  * Referenced from
@@ -88,36 +124,9 @@ export const parseSrv3XML = (xmlString: string) => {
     }
   } else {
     // No head present, give default values
-    cc.pens[1] = {
-      bold: false,
-      italic: false,
-      underline: false,
-      fontStyle: 0,
-      fontSize: 100,
-      fontColor: '#ffffff',
-      backColor: '#000000',
-      edgeColor: '#000000',
-      fontOpacity: 255,
-      backOpacity: 191,
-      edgeType: 0,
-      offset: 0,
-      ruby: 0,
-      horizontalGuide: false,
-      textEmphasis: '',
-    };
-    cc.windowStyles[1] = {
-      justify: 'center',
-      printDirection: 'ltr',
-      scrollDirection: 'ltr',
-      windowFillColor: '#000000',
-      windowFillOpacity: 0,
-      modeHint: 'default',
-    };
-    cc.windowPositions[1] = {
-      anchorPoint: '7',
-      alignHorizontal: 50,
-      alignVertical: 100,
-    };
+    cc.pens[1] = defaultPen;
+    cc.windowStyles[1] = defaultWindowStyle;
+    cc.windowPositions[1] = defaultWindowPosition;
   }
 
   /**
