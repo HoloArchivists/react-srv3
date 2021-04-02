@@ -27,7 +27,11 @@ export const CaptionsRenderer = ({
   const [activeEvents, setActiveEvents] = React.useState<CaptionEvent[]>([]);
 
   React.useEffect(() => {
-    setParsedCaptions(parseSrv3XML(srv3));
+    try {
+      setParsedCaptions(parseSrv3XML(srv3));
+    } catch (ex) {
+      console.error(ex);
+    }
   }, [srv3]);
 
   React.useEffect(() => {
