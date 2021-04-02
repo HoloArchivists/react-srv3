@@ -13,12 +13,16 @@ import { fontMap } from './constants';
 export type CaptionsRendererProps = {
   srv3: string;
   currentTime: number;
+  classnamePrefix?: string;
 };
 
 export const CaptionsRenderer = ({
   srv3,
   currentTime,
+  classnamePrefix,
 }: CaptionsRendererProps) => {
+  if (!classnamePrefix) classnamePrefix = 'react-srv3-';
+
   const refSelf = React.useRef<HTMLDivElement>(null);
   const [
     parsedCaptions,
@@ -109,7 +113,16 @@ export const CaptionsRenderer = ({
             );
 
             return (
-              <div className='react-srv3-caption-window' style={windowStyle}>
+              <div
+                className={classnamePrefix + 'caption-window'}
+                style={windowStyle}
+                data-wp={event.windowPositionId}
+                data-ap={wPos.anchorPoint}
+                data-cc={wPos.columnCount}
+                data-rc={wPos.rowCount}
+                data-ah={wPos.alignHorizontal}
+                data-av={wPos.alignVertical}
+              >
                 {event.segments.map((seg, idx) => {
                   const segmentStyle: React.CSSProperties = {
                     whiteSpace: 'pre',
@@ -164,7 +177,7 @@ export const CaptionsRenderer = ({
 
                   return (
                     <span
-                      className='react-srv3-caption-segment'
+                      className={classnamePrefix + 'caption-segment'}
                       style={segmentStyle}
                     >
                       {seg.text}
