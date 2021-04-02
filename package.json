@@ -1,6 +1,6 @@
 {
   "name": "react-srv3",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React component to render YouTube SRV3 closed captions",
   "author": "Hizkia Felix Winata",
   "license": "MIT",
