@@ -133,6 +133,7 @@ export const CaptionsRenderer = ({
                   if (idx === 0) segmentStyle.paddingLeft = '.25em';
                   if (idx === event.segments.length - 1)
                     segmentStyle.paddingRight = '.25em';
+                  // seg.text = seg.text.replace(/\n/g, ' \n ');
 
                   const pen = parsedCaptions.pens[seg.penId || 1] || defaultPen;
                   if (pen.bold) segmentStyle.fontWeight = 'bold';
@@ -181,7 +182,7 @@ export const CaptionsRenderer = ({
                       className={classnamePrefix + 'caption-segment'}
                       style={segmentStyle}
                     >
-                      {seg.text}
+                      {seg.text.replace(/\n/g, ' \n ')}
                     </span>
                   );
                 })}
