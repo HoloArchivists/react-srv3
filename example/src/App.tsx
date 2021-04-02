@@ -6,7 +6,10 @@ import YoutubePlayer from './YoutubePlayer';
 const App = () => {
   // const videoId = 'S8dmq5YIUoc';
   // const videoId = 'yLrstz80MKs';
-  const videoId = 'cJgSlCbfuC8';
+  const [videoURL, setVideoURL] = React.useState(
+    'https://youtube.com/watch?v=cJgSlCbfuC8'
+  );
+  const [videoId, setVideoId] = React.useState('cJgSlCbfuC8');
   // const videoId = 'eB90el6Zb_k';
 
   const [currentTime, setCurrentTime] = React.useState(0);
@@ -23,6 +26,15 @@ const App = () => {
   };
 
   React.useEffect(() => {
+    const url = new URL(videoURL);
+    if (
+      ['youtube.com', 'www.youtube.com', 'm.youtube.com'].includes(url.hostname)
+    )
+      setVideoId(url.searchParams.get('v') || '');
+    if (url.hostname === 'youtu.be') setVideoId(url.pathname.substr(1));
+  }, [videoURL]);
+
+  React.useEffect(() => {
     fetchCaptions();
   }, [videoId]);
 
@@ -35,6 +47,15 @@ const App = () => {
       }}
     >
       <div>
+        <input
+          type='text'
+          value={videoURL}
+          onChange={(e) => setVideoURL(e.target.value)}
+          style={{
+            width: '100%',
+          }}
+        />
+        <br />
         <YoutubePlayer videoId={videoId} onTimeChange={updateTime} />
         <div
           style={{
