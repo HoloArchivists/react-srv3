@@ -76,6 +76,7 @@ export const CaptionsRenderer = ({
             if (!parsedCaptions) return;
             const windowStyle: React.CSSProperties = {
               position: 'absolute',
+              whiteSpace: 'pre',
             };
             const wPos =
               parsedCaptions.windowPositions[event.windowPositionId] ||
