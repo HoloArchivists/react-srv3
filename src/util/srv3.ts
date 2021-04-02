@@ -67,66 +67,82 @@ export const parseSrv3XML = (xmlString: string) => {
     },
   };
 
+  // Assign default values
+  cc.pens[1] = defaultPen;
+  cc.windowStyles[1] = defaultWindowStyle;
+  cc.windowPositions[1] = defaultWindowPosition;
+
   /**
    * Parse head
    */
   if (xml.timedtext.head) {
-    for (const pen of xml.timedtext.head.pen) {
-      cc.pens[pen['@_id']] = {
-        bold: pen['@_b'] === '1',
-        italic: pen['@_i'] === '1',
-        underline: pen['@_u'] === '1',
-        fontStyle: Number(pen['@_fs'] || 0),
-        fontSize: Number(pen['@_sz'] || 100),
-        fontColor: pen['@_fc'] || '#ffffff',
-        backColor: pen['@_bc'] || '#000000',
-        edgeColor: pen['@_ec'] || '#000000',
-        fontOpacity: Number(pen['@_fo'] || 255),
-        backOpacity: Number(pen['@_bo'] || 191),
-        edgeType: Number(pen['@_et'] || 0),
-        offset: Number(pen['@_of'] || 0),
-        ruby: pen['@_rb'],
-        horizontalGuide: pen['@_hg'] === '1',
-        textEmphasis: pen['@_te'],
-      };
+    if (xml.timedtext.head.pen) {
+      // If there's only one element, it needs to be turned to an array
+      if (!Array.isArray(xml.timedtext.head.pen))
+        xml.timedtext.head.pen = [xml.timedtext.head.pen];
+
+      for (const pen of xml.timedtext.head.pen) {
+        cc.pens[pen['@_id']] = {
+          bold: pen['@_b'] === '1',
+          italic: pen['@_i'] === '1',
+          underline: pen['@_u'] === '1',
+          fontStyle: Number(pen['@_fs'] || 0),
+          fontSize: Number(pen['@_sz'] || 100),
+          fontColor: pen['@_fc'] || '#ffffff',
+          backColor: pen['@_bc'] || '#000000',
+          edgeColor: pen['@_ec'] || '#000000',
+          fontOpacity: Number(pen['@_fo'] || 255),
+          backOpacity: Number(pen['@_bo'] || 191),
+          edgeType: Number(pen['@_et'] || 0),
+          offset: Number(pen['@_of'] || 0),
+          ruby: pen['@_rb'],
+          horizontalGuide: pen['@_hg'] === '1',
+          textEmphasis: pen['@_te'],
+        };
+      }
     }
 
-    for (const ws of xml.timedtext.head.ws) {
-      cc.windowStyles[ws['@_id']] = {
-        justify:
-          ws['@_ju'] === '0'
-            ? 'start'
-            : ws['@_ju'] === '1'
-            ? 'end'
-            : ws['@_ju'] === '2'
-            ? 'center'
-            : ws['@_ju'] === '3'
-            ? 'justify'
-            : 'center',
-        printDirection:
-          ws['@_pd'] === '0' ? 'ltr' : ws['@_pd'] === '1' ? 'rtl' : 'ltr',
-        scrollDirection:
-          ws['@_sd'] === '0' ? 'ltr' : ws['@_sd'] === '1' ? 'rtl' : 'ltr',
-        modeHint: ws['@_mh'] === '2' ? 'scroll' : 'default',
-        windowFillColor: ws['@_wfc'] || '#000000',
-        windowFillOpacity: Number(ws['@_wfo'] || 0),
-      };
+    if (xml.timedtext.head.ws) {
+      if (!Array.isArray(xml.timedtext.head.ws))
+        xml.timedtext.head.ws = [xml.timedtext.head.ws];
+
+      for (const ws of xml.timedtext.head.ws) {
+        cc.windowStyles[ws['@_id']] = {
+          justify:
+            ws['@_ju'] === '0'
+              ? 'start'
+              : ws['@_ju'] === '1'
+              ? 'end'
+              : ws['@_ju'] === '2'
+              ? 'center'
+              : ws['@_ju'] === '3'
+              ? 'justify'
+              : 'center',
+          printDirection:
+            ws['@_pd'] === '0' ? 'ltr' : ws['@_pd'] === '1' ? 'rtl' : 'ltr',
+          scrollDirection:
+            ws['@_sd'] === '0' ? 'ltr' : ws['@_sd'] === '1' ? 'rtl' : 'ltr',
+          modeHint: ws['@_mh'] === '2' ? 'scroll' : 'default',
+          windowFillColor: ws['@_wfc'] || '#000000',
+          windowFillOpacity: Number(ws['@_wfo'] || 0),
+        };
+      }
     }
 
-    for (const wp of xml.timedtext.head.wp) {
-      cc.windowPositions[wp['@_id']] = {
-        anchorPoint: wp['@_ap'] || '7',
-        columnCount: wp['@_cc'],
-        rowCount: wp['@_rc'],
-        alignHorizontal: Number(wp['@_ah'] || 50),
-        alignVertical: Number(wp['@_av'] || 100),
-      };
+    if (xml.timedtext.head.wp) {
+      if (!Array.isArray(xml.timedtext.head.wp))
+        xml.timedtext.head.wp = [xml.timedtext.head.wp];
+
+      for (const wp of xml.timedtext.head.wp) {
+        cc.windowPositions[wp['@_id']] = {
+          anchorPoint: wp['@_ap'] || '7',
+          columnCount: wp['@_cc'],
+          rowCount: wp['@_rc'],
+          alignHorizontal: Number(wp['@_ah'] || 50),
+          alignVertical: Number(wp['@_av'] || 100),
+        };
+      }
     }
-  } else {
-    // No head present, give default values
-    cc.pens[1] = defaultPen;
-    cc.windowStyles[1] = defaultWindowStyle;
-    cc.windowPositions[1] = defaultWindowPosition;
   }
 
   /**

@@ -27,6 +27,12 @@ const YoutubePlayer = (props: YoutubePlayerProps) => {
     }
   }, []);
 
+  React.useEffect(() => {
+    try {
+      player.current.loadVideoById(videoId);
+    } catch (ex) {}
+  }, [videoId]);
+
   useAnimationFrame(() => {
     try {
       const time = player.current.getCurrentTime();
